@@ -333,3 +333,27 @@ class LoginPage(BasePage):
             "password_placeholder": self.get_password_placeholder(),
             "elements_present": self.verify_login_page_elements()
         }
+    
+    def is_remember_me_checkbox_visible(self):
+        """检查记住我复选框是否可见"""
+        return self.is_element_visible(self.REMEMBER_ME_CHECKBOX)
+    
+    def is_test_user_button_visible(self):
+        """检查测试用户按钮是否可见"""
+        return self.is_element_visible(self.TEST_USER_BUTTON)
+    
+    def is_register_link_visible(self):
+        """检查注册链接是否可见"""
+        return self.is_element_visible(self.REGISTER_LINK)
+    
+    def is_username_input_enabled(self):
+        """检查用户名输入框是否启用"""
+        return self.is_element_enabled(self.USERNAME_INPUT)
+    
+    def is_password_input_enabled(self):
+        """检查密码输入框是否启用"""
+        return self.is_element_enabled(self.PASSWORD_INPUT)
+    
+    def is_forgot_password_link_visible(self):
+        """检查忘记密码链接是否可见"""
+        return self.is_element_visible(self.FORGOT_PASSWORD_LINK)

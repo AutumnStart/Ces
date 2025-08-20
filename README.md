@@ -197,19 +197,21 @@ python -m pytest tests/database/ -v
 #### 2. API自动化测试
 ```bash
 # 确保Flask应用正在运行，然后执行API测试
+# 注意：当前项目中API测试位于 tests/automation/api/ 目录
+# 如果该目录为空，请先创建API测试文件
 python -m pytest tests/automation/api/ -v
 ```
 
 #### 3. UI自动化测试
 ```bash
 # 运行UI自动化测试（需要Chrome浏览器）
-python -m pytest tests/automation/ui/ -v
+python -m pytest tests/ui/ -v
 
 # 运行特定的UI测试
-python -m pytest tests/automation/ui/test_login.py -v
+python -m pytest tests/ui/test_login.py -v
 
 # 无头模式运行（不显示浏览器界面）
-python -m pytest tests/automation/ui/ -v --headless
+python -m pytest tests/ui/ -v --headless
 ```
 
 #### 4. 性能测试
@@ -242,9 +244,9 @@ pytest tests/ -m "smoke"            # 运行特定标记的测试
 pytest tests/ --maxfail=1           # 第一个失败后停止
 
 # UI测试特定参数
-pytest tests/automation/ui/ --browser=chrome    # 指定浏览器
-pytest tests/automation/ui/ --headless          # 无头模式
-pytest tests/automation/ui/ --base-url=http://localhost:5000  # 指定基础URL
+pytest tests/ui/ --browser=chrome    # 指定浏览器
+pytest tests/ui/ --headless          # 无头模式
+pytest tests/ui/ --base-url=http://localhost:5000  # 指定基础URL
 ```
 
 ## 项目核心特性
@@ -359,10 +361,10 @@ rm -rf ~/.wdm  # Linux/macOS
 **A**: 尝试以下解决方案：
 ```bash
 # 1. 使用无头模式
-pytest tests/automation/ui/ --headless
+pytest tests/ui/ --headless
 
 # 2. 增加等待时间
-pytest tests/automation/ui/ --timeout=30
+pytest tests/ui/ --timeout=30
 
 # 3. 检查Chrome版本兼容性
 chrome --version

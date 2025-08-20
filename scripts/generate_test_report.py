@@ -41,10 +41,16 @@ class TestReportGenerator:
         print("📊 收集测试结果...")
         
         # 收集单元测试结果
-        self._collect_pytest_results('unit_tests', 'tests/automation/api')
+        # 注意：当前API测试目录为空，暂时跳过
+        # self._collect_pytest_results('unit_tests', 'tests/automation/api')
         
-        # 收集API测试结果
-        self._collect_pytest_results('api_tests', 'tests/automation/api')
+        # API测试结果 - 目录为空，暂时跳过
+        # self._collect_pytest_results('api_tests', 'tests/automation/api')
+        
+        # 使用实际存在的测试目录
+        self._collect_pytest_results('ui_tests', 'tests/ui')
+        self._collect_pytest_results('database_tests', 'tests/database')
+        self._collect_pytest_results('performance_tests', 'tests/performance')
         
         # 收集UI测试结果
         self._collect_pytest_results('ui_tests', 'tests/ui')

@@ -153,6 +153,10 @@ class HomePage(BasePage):
             return self.get_text(self.USER_DROPDOWN)
         return None
     
+    def get_logged_in_username(self):
+        """获取已登录用户的用户名"""
+        return self.get_username_from_dropdown()
+    
     # 轮播图操作
     def click_carousel_next(self):
         """点击轮播图下一张"""
