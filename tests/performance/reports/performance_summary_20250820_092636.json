@@ -1,0 +1,17 @@
+{
+  "timestamp": "20250820_092636",
+  "total_tests": 1,
+  "successful_tests": 0,
+  "failed_tests": 1,
+  "total_execution_time": 0.6280536651611328,
+  "results": [
+    {
+      "type": "pytest_quick",
+      "success": false,
+      "execution_time": 0.6280536651611328,
+      "report_file": "D:\\project\\BY\\CS\\tests\\performance\\reports\\pytest_performance_quick_20250820_092635.html",
+      "stdout": "",
+      "stderr": "C:\\Users\\EDY\\AppData\\Local\\Programs\\Python\\Python312_Real\\Lib\\site-packages\\_pytest\\config\\__init__.py:331: PluggyTeardownRaisedWarning: A plugin raised an exception during an old-style hookwrapper teardown.\nPlugin: helpconfig, Hook: pytest_cmdline_parse\nUsageError: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --json-report=D:\\project\\BY\\CS\\tests\\performance\\reports\\pytest_performance_quick_20250820_092635.json\n  inifile: D:\\project\\BY\\CS\\pytest.ini\n  rootdir: D:\\project\\BY\\CS\nFor more information see https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluggyTeardownRaisedWarning\n  config = pluginmanager.hook.pytest_cmdline_parse(\nERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --json-report=D:\\project\\BY\\CS\\tests\\performance\\reports\\pytest_performance_quick_20250820_092635.json\n  inifile: D:\\project\\BY\\CS\\pytest.ini\n  rootdir: D:\\project\\BY\\CS\n\n"
+    }
+  ]
+}

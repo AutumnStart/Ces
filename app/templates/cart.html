@@ -1,0 +1,775 @@
+{% extends "base.html" %}
+
+{% block title %}购物车 - 测试商城{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-shopping-cart text-primary me-2"></i>购物车
+            </h2>
+            <div class="text-muted">
+                <span data-testid="cart-item-count">{{ cart_items|length }}</span> 件商品
+            </div>
+        </div>
+        
+        {% if cart_items %}
+        <div class="row">
+            <!-- 购物车商品列表 -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="selectAll"
+                                           onchange="toggleSelectAll()"
+                                           data-testid="select-all-checkbox">
+                                    <label class="form-check-label" for="selectAll">
+                                        全选
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <strong>商品信息</strong>
+                            </div>
+                            <div class="col-2 text-center">
+                                <strong>单价</strong>
+                            </div>
+                            <div class="col-2 text-center">
+                                <strong>数量</strong>
+                            </div>
+                            <div class="col-2 text-center">
+                                <strong>操作</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-0">
+                        {% for item in cart_items %}
+                        <div class="cart-item border-bottom p-3" data-item-id="{{ item.id }}">
+                            <div class="row align-items-center">
+                                <!-- 选择框 -->
+                                <div class="col-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input item-checkbox" 
+                                               type="checkbox" 
+                                               id="item-{{ item.id }}"
+                                               value="{{ item.id }}"
+                                               onchange="updateCartSummary()"
+                                               data-testid="item-checkbox-{{ item.id }}"
+                                               checked>
+                                    </div>
+                                </div>
+                                
+                                <!-- 商品信息 -->
+                                <div class="col-5">
+                                    <div class="d-flex align-items-center">
+                                        <div class="product-image me-3">
+                                            {% if item.product.image_url %}
+                                                <img src="{{ item.product.image_url }}" 
+                                                     alt="{{ item.product.name }}" 
+                                                     class="img-thumbnail" 
+                                                     style="width: 80px; height: 80px; object-fit: cover;"
+                                                     data-testid="item-image-{{ item.id }}">
+                                            {% else %}
+                                                <div class="bg-light d-flex align-items-center justify-content-center img-thumbnail" 
+                                                     style="width: 80px; height: 80px;">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="product-info">
+                                            <h6 class="mb-1">
+                                                <a href="{{ url_for('product_detail', product_id=item.product.id) }}" 
+                                                   class="text-decoration-none"
+                                                   data-testid="item-name-{{ item.id }}">
+                                                    {{ item.product.name }}
+                                                </a>
+                                            </h6>
+                                            <small class="text-muted" data-testid="item-specs-{{ item.id }}">
+                                                分类: {{ item.product.category }}
+                                                {% if item.specifications %}
+                                                    | {{ item.specifications }}
+                                                {% endif %}
+                                            </small>
+                                            <div class="mt-1">
+                                                <span class="badge bg-success">现货</span>
+                                                <span class="badge bg-info">包邮</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 单价 -->
+                                <div class="col-2 text-center">
+                                    <div class="price">
+                                        <span class="text-primary fw-bold" 
+                                              data-testid="item-price-{{ item.id }}">
+                                            ¥{{ "%.2f"|format(item.product.price) }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 数量 -->
+                                <div class="col-2 text-center">
+                                    <div class="quantity-controls">
+                                        <div class="input-group input-group-sm" style="width: 120px; margin: 0 auto;">
+                                            <button class="btn btn-outline-secondary" 
+                                                    type="button" 
+                                                    onclick="updateQuantity({{ item.id }}, -1)"
+                                                    data-testid="decrease-quantity-{{ item.id }}">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" 
+                                                   class="form-control text-center" 
+                                                   value="{{ item.quantity }}" 
+                                                   min="1" 
+                                                   max="{{ item.product.stock }}"
+                                                   onchange="updateQuantity({{ item.id }}, 0, this.value)"
+                                                   data-testid="quantity-input-{{ item.id }}">
+                                            <button class="btn btn-outline-secondary" 
+                                                    type="button" 
+                                                    onclick="updateQuantity({{ item.id }}, 1)"
+                                                    data-testid="increase-quantity-{{ item.id }}">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <small class="text-muted mt-1 d-block">
+                                            库存: {{ item.product.stock }}
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <!-- 操作 -->
+                                <div class="col-2 text-center">
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                onclick="removeFromCart({{ item.id }})"
+                                                data-testid="remove-item-{{ item.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary mt-1" 
+                                                onclick="moveToWishlist({{ item.id }})"
+                                                data-testid="move-to-wishlist-{{ item.id }}">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- 批量操作 -->
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="batch-actions">
+                                <button class="btn btn-sm btn-outline-danger me-2" 
+                                        onclick="removeSelectedItems()"
+                                        data-testid="remove-selected-button">
+                                    <i class="fas fa-trash me-1"></i>删除选中
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" 
+                                        onclick="moveSelectedToWishlist()"
+                                        data-testid="move-selected-to-wishlist">
+                                    <i class="far fa-heart me-1"></i>移入收藏夹
+                                </button>
+                            </div>
+                            <div class="continue-shopping">
+                                <a href="{{ url_for('products') }}" 
+                                   class="btn btn-outline-primary"
+                                   data-testid="continue-shopping">
+                                    <i class="fas fa-arrow-left me-1"></i>继续购物
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 订单摘要 -->
+            <div class="col-lg-4">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calculator me-2"></i>订单摘要
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 优惠券 -->
+                        <div class="coupon-section mb-3">
+                            <label class="form-label">优惠券</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       class="form-control" 
+                                       placeholder="请输入优惠券代码"
+                                       id="couponCode"
+                                       data-testid="coupon-input">
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        onclick="applyCoupon()"
+                                        data-testid="apply-coupon-button">
+                                    使用
+                                </button>
+                            </div>
+                            <div class="available-coupons mt-2">
+                                <small class="text-muted">可用优惠券:</small>
+                                <div class="mt-1">
+                                    <span class="badge bg-light text-dark me-1 coupon-badge" 
+                                          onclick="applyCouponCode('SAVE10')"
+                                          data-testid="coupon-save10">
+                                        SAVE10 (9折)
+                                    </span>
+                                    <span class="badge bg-light text-dark coupon-badge" 
+                                          onclick="applyCouponCode('FREE20')"
+                                          data-testid="coupon-free20">
+                                        FREE20 (满200减20)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 费用明细 -->
+                        <div class="cost-breakdown">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>商品总价:</span>
+                                <span id="subtotal" data-testid="subtotal">¥0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>运费:</span>
+                                <span id="shipping" data-testid="shipping">¥0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 text-success" id="discountRow" style="display: none;">
+                                <span>优惠:</span>
+                                <span id="discount" data-testid="discount">-¥0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>总计:</span>
+                                <span class="text-primary" id="total" data-testid="total">¥0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 配送信息 -->
+                        <div class="delivery-info mt-3 p-2 bg-light rounded">
+                            <small class="text-muted">
+                                <i class="fas fa-truck me-1"></i>
+                                预计配送时间: 1-3个工作日<br>
+                                <i class="fas fa-shield-alt me-1"></i>
+                                支持7天无理由退货
+                            </small>
+                        </div>
+                        
+                        <!-- 结算按钮 -->
+                        <div class="checkout-section mt-3">
+                            <button class="btn btn-primary btn-lg w-100" 
+                                    onclick="proceedToCheckout()"
+                                    id="checkoutBtn"
+                                    data-testid="checkout-button">
+                                <i class="fas fa-credit-card me-2"></i>去结算
+                            </button>
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    已选择 <span id="selectedCount" data-testid="selected-count">0</span> 件商品
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- 安全保障 -->
+                        <div class="security-badges mt-3 text-center">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-lock text-success me-1"></i>
+                                        <small class="text-muted">安全支付</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-medal text-warning me-1"></i>
+                                        <small class="text-muted">品质保证</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 推荐商品 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-thumbs-up me-2"></i>为您推荐
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% for i in range(3) %}
+                        <div class="d-flex align-items-center mb-3 {% if not loop.last %}border-bottom pb-3{% endif %}">
+                            <div class="recommendation-image me-3">
+                                <div class="bg-light d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 small">推荐商品 {{ i+1 }}</h6>
+                                <div class="text-primary fw-bold small">¥{{ "%.2f"|format((i+1)*79.99) }}</div>
+                                <button class="btn btn-sm btn-outline-primary mt-1" 
+                                        onclick="addRecommendedToCart({{ i+1 }})"
+                                        data-testid="add-recommended-{{ i }}">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <!-- 空购物车 -->
+        <div class="empty-cart text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-shopping-cart text-muted" style="font-size: 5rem;"></i>
+            </div>
+            <h4 class="text-muted mb-3">购物车是空的</h4>
+            <p class="text-muted mb-4">快去挑选喜欢的商品吧！</p>
+            <a href="{{ url_for('products') }}" 
+               class="btn btn-primary btn-lg"
+               data-testid="go-shopping-button">
+                <i class="fas fa-shopping-bag me-2"></i>去购物
+            </a>
+            
+            <!-- 热门商品推荐 -->
+            <div class="mt-5">
+                <h5 class="mb-4">热门商品推荐</h5>
+                <div class="row justify-content-center">
+                    {% for i in range(4) %}
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card product-card h-100">
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                 style="height: 150px;">
+                                <i class="fas fa-image text-muted" style="font-size: 2rem;"></i>
+                            </div>
+                            <div class="card-body text-center">
+                                <h6 class="card-title small">热门商品 {{ i+1 }}</h6>
+                                <div class="text-primary fw-bold">¥{{ "%.2f"|format((i+1)*99.99) }}</div>
+                                <button class="btn btn-sm btn-primary mt-2" 
+                                        onclick="addToCart({{ i+1 }})"
+                                        data-testid="add-hot-product-{{ i }}">
+                                    <i class="fas fa-cart-plus"></i> 加入购物车
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 全选/取消全选
+    function toggleSelectAll() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+        
+        updateCartSummary();
+    }
+    
+    // 更新购物车摘要
+    function updateCartSummary() {
+        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const allItems = document.querySelectorAll('.item-checkbox');
+        
+        // 更新全选状态
+        selectAllCheckbox.checked = selectedItems.length === allItems.length && allItems.length > 0;
+        selectAllCheckbox.indeterminate = selectedItems.length > 0 && selectedItems.length < allItems.length;
+        
+        // 计算总价
+        let subtotal = 0;
+        let selectedCount = 0;
+        
+        selectedItems.forEach(checkbox => {
+            const itemId = checkbox.value;
+            const cartItem = checkbox.closest('.cart-item');
+            const priceElement = cartItem.querySelector('[data-testid^="item-price-"]');
+            const quantityElement = cartItem.querySelector('[data-testid^="quantity-input-"]');
+            
+            if (priceElement && quantityElement) {
+                const price = parseFloat(priceElement.textContent.replace('¥', ''));
+                const quantity = parseInt(quantityElement.value);
+                subtotal += price * quantity;
+                selectedCount += quantity;
+            }
+        });
+        
+        // 计算运费（满99免运费）
+        const shipping = subtotal >= 99 ? 0 : 10;
+        
+        // 计算优惠
+        const discount = calculateDiscount(subtotal);
+        
+        // 计算总计
+        const total = subtotal + shipping - discount;
+        
+        // 更新显示
+        document.getElementById('subtotal').textContent = `¥${subtotal.toFixed(2)}`;
+        document.getElementById('shipping').textContent = shipping === 0 ? '免费' : `¥${shipping.toFixed(2)}`;
+        document.getElementById('total').textContent = `¥${total.toFixed(2)}`;
+        document.getElementById('selectedCount').textContent = selectedCount;
+        
+        // 显示/隐藏优惠行
+        const discountRow = document.getElementById('discountRow');
+        if (discount > 0) {
+            document.getElementById('discount').textContent = `-¥${discount.toFixed(2)}`;
+            discountRow.style.display = 'flex';
+        } else {
+            discountRow.style.display = 'none';
+        }
+        
+        // 更新结算按钮状态
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        checkoutBtn.disabled = selectedItems.length === 0;
+        
+        if (selectedItems.length === 0) {
+            checkoutBtn.textContent = '请选择商品';
+        } else {
+            checkoutBtn.innerHTML = `<i class="fas fa-credit-card me-2"></i>去结算 (¥${total.toFixed(2)})`;
+        }
+    }
+    
+    // 计算优惠金额
+    function calculateDiscount(subtotal) {
+        const appliedCoupon = localStorage.getItem('appliedCoupon');
+        
+        if (appliedCoupon === 'SAVE10') {
+            return subtotal * 0.1; // 9折
+        } else if (appliedCoupon === 'FREE20' && subtotal >= 200) {
+            return 20; // 满200减20
+        }
+        
+        return 0;
+    }
+    
+    // 更新商品数量
+    function updateQuantity(itemId, delta, newValue = null) {
+        const quantityInput = document.querySelector(`[data-testid="quantity-input-${itemId}"]`);
+        const currentValue = parseInt(quantityInput.value);
+        const maxValue = parseInt(quantityInput.max);
+        const minValue = 1;
+        
+        let finalValue;
+        if (newValue !== null) {
+            finalValue = parseInt(newValue);
+        } else {
+            finalValue = currentValue + delta;
+        }
+        
+        if (finalValue < minValue) {
+            finalValue = minValue;
+        } else if (finalValue > maxValue) {
+            finalValue = maxValue;
+            showAlert(`最多只能购买 ${maxValue} 件`, 'warning');
+        }
+        
+        quantityInput.value = finalValue;
+        
+        // 发送更新请求到服务器
+        fetch('/api/cart/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item_id: itemId,
+                quantity: finalValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartSummary();
+            } else {
+                showAlert(data.message || '更新失败', 'error');
+                // 恢复原值
+                quantityInput.value = currentValue;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('更新失败', 'error');
+            quantityInput.value = currentValue;
+        });
+    }
+    
+    // 从购物车移除商品
+    function removeFromCart(itemId) {
+        if (!confirm('确定要删除这件商品吗？')) {
+            return;
+        }
+        
+        fetch('/api/cart/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item_id: itemId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 移除DOM元素
+                const cartItem = document.querySelector(`[data-item-id="${itemId}"]`);
+                cartItem.remove();
+                
+                updateCartSummary();
+                showAlert('商品已删除', 'success');
+                
+                // 检查是否还有商品
+                const remainingItems = document.querySelectorAll('.cart-item');
+                if (remainingItems.length === 0) {
+                    location.reload(); // 重新加载页面显示空购物车
+                }
+            } else {
+                showAlert(data.message || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('删除失败', 'error');
+        });
+    }
+    
+    // 移动到收藏夹
+    function moveToWishlist(itemId) {
+        fetch('/api/cart/move-to-wishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item_id: itemId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                removeFromCart(itemId);
+                showAlert('已移入收藏夹', 'success');
+            } else {
+                showAlert(data.message || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('操作失败', 'error');
+        });
+    }
+    
+    // 批量删除选中商品
+    function removeSelectedItems() {
+        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+        
+        if (selectedItems.length === 0) {
+            showAlert('请选择要删除的商品', 'warning');
+            return;
+        }
+        
+        if (!confirm(`确定要删除选中的 ${selectedItems.length} 件商品吗？`)) {
+            return;
+        }
+        
+        const itemIds = Array.from(selectedItems).map(checkbox => checkbox.value);
+        
+        fetch('/api/cart/remove-multiple', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item_ids: itemIds
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 移除DOM元素
+                selectedItems.forEach(checkbox => {
+                    const cartItem = checkbox.closest('.cart-item');
+                    cartItem.remove();
+                });
+                
+                updateCartSummary();
+                showAlert('选中商品已删除', 'success');
+                
+                // 检查是否还有商品
+                const remainingItems = document.querySelectorAll('.cart-item');
+                if (remainingItems.length === 0) {
+                    location.reload();
+                }
+            } else {
+                showAlert(data.message || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('删除失败', 'error');
+        });
+    }
+    
+    // 批量移动到收藏夹
+    function moveSelectedToWishlist() {
+        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+        
+        if (selectedItems.length === 0) {
+            showAlert('请选择要移入收藏夹的商品', 'warning');
+            return;
+        }
+        
+        const itemIds = Array.from(selectedItems).map(checkbox => checkbox.value);
+        
+        fetch('/api/cart/move-multiple-to-wishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item_ids: itemIds
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                removeSelectedItems();
+                showAlert('选中商品已移入收藏夹', 'success');
+            } else {
+                showAlert(data.message || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('操作失败', 'error');
+        });
+    }
+    
+    // 应用优惠券
+    function applyCoupon() {
+        const couponCode = document.getElementById('couponCode').value.trim();
+        
+        if (!couponCode) {
+            showAlert('请输入优惠券代码', 'warning');
+            return;
+        }
+        
+        applyCouponCode(couponCode);
+    }
+    
+    // 应用优惠券代码
+    function applyCouponCode(code) {
+        fetch('/api/coupon/apply', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                coupon_code: code
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('appliedCoupon', code);
+                document.getElementById('couponCode').value = code;
+                updateCartSummary();
+                showAlert(`优惠券 ${code} 应用成功`, 'success');
+                
+                // 禁用优惠券输入
+                document.getElementById('couponCode').disabled = true;
+                document.querySelector('[data-testid="apply-coupon-button"]').textContent = '已应用';
+                document.querySelector('[data-testid="apply-coupon-button"]').disabled = true;
+            } else {
+                showAlert(data.message || '优惠券无效', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('应用优惠券失败', 'error');
+        });
+    }
+    
+    // 去结算
+    function proceedToCheckout() {
+        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+        
+        if (selectedItems.length === 0) {
+            showAlert('请选择要结算的商品', 'warning');
+            return;
+        }
+        
+        const itemIds = Array.from(selectedItems).map(checkbox => checkbox.value);
+        
+        // 将选中的商品ID存储到sessionStorage
+        sessionStorage.setItem('checkoutItems', JSON.stringify(itemIds));
+        
+        // 跳转到结算页面
+        window.location.href = '/checkout';
+    }
+    
+    // 添加推荐商品到购物车
+    function addRecommendedToCart(productId) {
+        addToCart(productId, 1, {}, function() {
+            showAlert('推荐商品已添加到购物车', 'success');
+        });
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化购物车摘要
+        updateCartSummary();
+        
+        // 检查是否有已应用的优惠券
+        const appliedCoupon = localStorage.getItem('appliedCoupon');
+        if (appliedCoupon) {
+            document.getElementById('couponCode').value = appliedCoupon;
+            document.getElementById('couponCode').disabled = true;
+            document.querySelector('[data-testid="apply-coupon-button"]').textContent = '已应用';
+            document.querySelector('[data-testid="apply-coupon-button"]').disabled = true;
+        }
+        
+        // 监听数量输入框变化
+        document.querySelectorAll('[data-testid^="quantity-input-"]').forEach(input => {
+            input.addEventListener('blur', function() {
+                const itemId = this.dataset.testid.replace('quantity-input-', '');
+                const value = parseInt(this.value);
+                const max = parseInt(this.max);
+                const min = 1;
+                
+                if (value < min) {
+                    this.value = min;
+                    updateQuantity(itemId, 0, min);
+                } else if (value > max) {
+                    this.value = max;
+                    updateQuantity(itemId, 0, max);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

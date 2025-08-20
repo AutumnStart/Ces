@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - 测试商城{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-sign-in-alt"></i> 用户登录
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" id="loginForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> 用户名
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               required 
+                               placeholder="请输入用户名"
+                               data-testid="username-input">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> 密码
+                        </label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   required 
+                                   placeholder="请输入密码"
+                                   data-testid="password-input">
+                            <button class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    id="togglePassword"
+                                    data-testid="toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="rememberMe"
+                               data-testid="remember-checkbox">
+                        <label class="form-check-label" for="rememberMe">
+                            记住我
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" 
+                                class="btn btn-primary" 
+                                id="loginBtn"
+                                data-testid="login-button">
+                            <i class="fas fa-sign-in-alt"></i> 登录
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="mb-2">还没有账户？</p>
+                    <a href="{{ url_for('register') }}" 
+                       class="btn btn-outline-primary"
+                       data-testid="register-link">
+                        <i class="fas fa-user-plus"></i> 立即注册
+                    </a>
+                </div>
+                
+                <!-- 测试用户信息 -->
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-info-circle"></i> 测试账户
+                    </h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <strong>普通用户:</strong><br>
+                                用户名: testuser<br>
+                                密码: testpassword123
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <strong>管理员:</strong><br>
+                                用户名: admin<br>
+                                密码: admin123
+                            </small>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-secondary me-2" 
+                                onclick="fillTestUser()"
+                                data-testid="fill-test-user">
+                            填入测试用户
+                        </button>
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-secondary" 
+                                onclick="fillAdminUser()"
+                                data-testid="fill-admin-user">
+                            填入管理员
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 密码显示/隐藏切换
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+    
+    // 填入测试用户信息
+    function fillTestUser() {
+        document.getElementById('username').value = 'testuser';
+        document.getElementById('password').value = 'testpassword123';
+    }
+    
+    // 填入管理员信息
+    function fillAdminUser() {
+        document.getElementById('username').value = 'admin';
+        document.getElementById('password').value = 'admin123';
+    }
+    
+    // 表单验证
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        let isValid = true;
+        
+        // 清除之前的验证状态
+        username.classList.remove('is-invalid');
+        password.classList.remove('is-invalid');
+        
+        // 验证用户名
+        if (username.value.trim().length < 3) {
+            username.classList.add('is-invalid');
+            username.nextElementSibling.textContent = '用户名至少需要3个字符';
+            isValid = false;
+        }
+        
+        // 验证密码
+        if (password.value.length < 6) {
+            password.classList.add('is-invalid');
+            password.parentElement.nextElementSibling.textContent = '密码至少需要6个字符';
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        } else {
+            // 显示加载状态
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+            loginBtn.disabled = true;
+        }
+    });
+    
+    // 输入时清除验证错误
+    document.getElementById('username').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+    
+    document.getElementById('password').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+    
+    // 记住我功能（使用localStorage）
+    document.addEventListener('DOMContentLoaded', function() {
+        const rememberMe = localStorage.getItem('rememberMe');
+        const savedUsername = localStorage.getItem('savedUsername');
+        
+        if (rememberMe === 'true' && savedUsername) {
+            document.getElementById('username').value = savedUsername;
+            document.getElementById('rememberMe').checked = true;
+        }
+    });
+    
+    // 保存记住我状态
+    document.getElementById('loginForm').addEventListener('submit', function() {
+        const rememberMe = document.getElementById('rememberMe').checked;
+        const username = document.getElementById('username').value;
+        
+        if (rememberMe) {
+            localStorage.setItem('rememberMe', 'true');
+            localStorage.setItem('savedUsername', username);
+        } else {
+            localStorage.removeItem('rememberMe');
+            localStorage.removeItem('savedUsername');
+        }
+    });
+</script>
+{% endblock %}

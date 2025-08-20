@@ -1,0 +1,36 @@
+Method,Name,Error,Occurrences
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.041811秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.041517秒'),1
+GET,管理商品,CatchResponseError('状态码错误: 500'),3
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.056036秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.036931秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.035192秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.037514秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.038843秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.042213秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.044277秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.055467秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.029611秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.043425秒'),1
+GET,查看商品详情,CatchResponseError('状态码错误: 500'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.023246秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.045564秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.035925秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.036751秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.045701秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.042084秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.026522秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.037122秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.031249秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.035429秒'),1
+GET,管理员仪表板,CatchResponseError('状态码错误: 500'),12
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.038071秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.023621秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.027703秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.02645秒'),1
+GET,查看订单,CatchResponseError('状态码错误: 500'),5
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.042375秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.04403秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.053463秒'),1
+GET,压力测试-首页,CatchResponseError('响应时间过长: 2.023554秒'),1
+GET,访问首页,CatchResponseError('首页内容不正确'),9

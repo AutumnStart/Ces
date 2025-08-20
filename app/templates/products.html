@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}商品列表 - 测试商城{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 侧边栏筛选 -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter"></i> 筛选条件
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- 搜索框 -->
+                <div class="mb-3">
+                    <label for="searchInput" class="form-label">商品搜索</label>
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               id="searchInput" 
+                               placeholder="搜索商品名称"
+                               value="{{ search_term }}"
+                               data-testid="search-input">
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                onclick="searchProducts()"
+                                data-testid="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 分类筛选 -->
+                <div class="mb-3">
+                    <label class="form-label">商品分类</label>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('products') }}" 
+                           class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}"
+                           data-testid="category-all">
+                            <i class="fas fa-th-large"></i> 全部分类
+                        </a>
+                        {% for category in categories %}
+                        <a href="{{ url_for('products', category=category) }}" 
+                           class="list-group-item list-group-item-action {% if current_category == category %}active{% endif %}"
+                           data-testid="category-{{ category }}">
+                            <i class="fas fa-tag"></i> {{ category }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- 价格筛选 -->
+                <div class="mb-3">
+                    <label class="form-label">价格范围</label>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="number" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="最低价"
+                                   id="minPrice"
+                                   data-testid="min-price">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="最高价"
+                                   id="maxPrice"
+                                   data-testid="max-price">
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary mt-2 w-100" 
+                            onclick="filterByPrice()"
+                            data-testid="price-filter-button">
+                        应用价格筛选
+                    </button>
+                </div>
+                
+                <!-- 排序选项 -->
+                <div class="mb-3">
+                    <label for="sortSelect" class="form-label">排序方式</label>
+                    <select class="form-select" 
+                            id="sortSelect" 
+                            onchange="sortProducts()"
+                            data-testid="sort-select">
+                        <option value="default">默认排序</option>
+                        <option value="price-asc">价格从低到高</option>
+                        <option value="price-desc">价格从高到低</option>
+                        <option value="name-asc">名称A-Z</option>
+                        <option value="name-desc">名称Z-A</option>
+                    </select>
+                </div>
+                
+                <!-- 清除筛选 -->
+                <button class="btn btn-outline-secondary w-100" 
+                        onclick="clearFilters()"
+                        data-testid="clear-filters">
+                    <i class="fas fa-times"></i> 清除筛选
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 商品列表 -->
+    <div class="col-md-9">
+        <!-- 页面标题和统计 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>商品列表</h2>
+                {% if current_category %}
+                    <p class="text-muted mb-0">分类：{{ current_category }}</p>
+                {% endif %}
+                {% if search_term %}
+                    <p class="text-muted mb-0">搜索："{{ search_term }}"</p>
+                {% endif %}
+            </div>
+            <div class="text-muted">
+                共 {{ products.total }} 件商品
+            </div>
+        </div>
+        
+        <!-- 商品网格 -->
+        {% if products.items %}
+        <div class="row" id="productGrid">
+            {% for product in products.items %}
+            <div class="col-md-4 col-lg-3 mb-4 product-item" 
+                 data-name="{{ product.name.lower() }}" 
+                 data-price="{{ product.price }}" 
+                 data-category="{{ product.category }}">
+                <div class="card product-card h-100 shadow-sm">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                         style="height: 200px; cursor: pointer;" 
+                         onclick="window.location.href='{{ url_for('product_detail', product_id=product.id) }}'">
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}" 
+                                 alt="{{ product.name }}" 
+                                 class="img-fluid" 
+                                 style="max-height: 180px;"
+                                 data-testid="product-image-{{ product.id }}">
+                        {% else %}
+                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title" data-testid="product-name-{{ product.id }}">
+                            {{ product.name }}
+                        </h6>
+                        <p class="card-text text-muted small flex-grow-1" 
+                           data-testid="product-description-{{ product.id }}">
+                            {{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}
+                        </p>
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-primary fw-bold fs-5" 
+                                      data-testid="product-price-{{ product.id }}">
+                                    ¥{{ "%.2f"|format(product.price) }}
+                                </span>
+                                <small class="text-muted" 
+                                       data-testid="product-stock-{{ product.id }}">
+                                    库存: {{ product.stock }}
+                                </small>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}" 
+                                   class="btn btn-outline-primary btn-sm flex-grow-1"
+                                   data-testid="view-product-{{ product.id }}">
+                                    <i class="fas fa-eye"></i> 查看
+                                </a>
+                                
+                                {% if session.user_id %}
+                                    {% if product.stock > 0 %}
+                                        <button onclick="addToCart({{ product.id }})" 
+                                                class="btn btn-cart btn-sm text-white"
+                                                data-testid="add-to-cart-{{ product.id }}">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>
+                                            <i class="fas fa-times"></i> 缺货
+                                        </button>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{ url_for('login') }}" 
+                                       class="btn btn-cart btn-sm text-white"
+                                       data-testid="login-to-cart-{{ product.id }}">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- 分页 -->
+        {% if products.pages > 1 %}
+        <nav aria-label="商品分页" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if products.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           href="{{ url_for('products', page=products.prev_num, category=current_category, search=search_term) }}"
+                           data-testid="prev-page">
+                            <i class="fas fa-chevron-left"></i> 上一页
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for page_num in products.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != products.page %}
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="{{ url_for('products', page=page_num, category=current_category, search=search_term) }}"
+                                   data-testid="page-{{ page_num }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item active">
+                                <span class="page-link" data-testid="current-page">{{ page_num }}</span>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           href="{{ url_for('products', page=products.next_num, category=current_category, search=search_term) }}"
+                           data-testid="next-page">
+                            下一页 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <!-- 无商品提示 -->
+        <div class="text-center py-5">
+            <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3 text-muted">没有找到相关商品</h4>
+            <p class="text-muted">请尝试调整筛选条件或搜索关键词</p>
+            <button class="btn btn-primary" onclick="clearFilters()">
+                <i class="fas fa-refresh"></i> 重置筛选
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 搜索商品
+    function searchProducts() {
+        const searchTerm = document.getElementById('searchInput').value;
+        const currentCategory = '{{ current_category }}';
+        
+        let url = '{{ url_for("products") }}';
+        const params = new URLSearchParams();
+        
+        if (searchTerm) {
+            params.append('search', searchTerm);
+        }
+        if (currentCategory) {
+            params.append('category', currentCategory);
+        }
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+        
+        window.location.href = url;
+    }
+    
+    // 回车搜索
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchProducts();
+        }
+    });
+    
+    // 价格筛选
+    function filterByPrice() {
+        const minPrice = document.getElementById('minPrice').value;
+        const maxPrice = document.getElementById('maxPrice').value;
+        
+        // 客户端筛选（简单实现）
+        const products = document.querySelectorAll('.product-item');
+        
+        products.forEach(product => {
+            const price = parseFloat(product.dataset.price);
+            let show = true;
+            
+            if (minPrice && price < parseFloat(minPrice)) {
+                show = false;
+            }
+            if (maxPrice && price > parseFloat(maxPrice)) {
+                show = false;
+            }
+            
+            product.style.display = show ? 'block' : 'none';
+        });
+    }
+    
+    // 商品排序
+    function sortProducts() {
+        const sortValue = document.getElementById('sortSelect').value;
+        const productGrid = document.getElementById('productGrid');
+        const products = Array.from(document.querySelectorAll('.product-item'));
+        
+        products.sort((a, b) => {
+            switch (sortValue) {
+                case 'price-asc':
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                case 'price-desc':
+                    return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                case 'name-asc':
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                case 'name-desc':
+                    return b.dataset.name.localeCompare(a.dataset.name);
+                default:
+                    return 0;
+            }
+        });
+        
+        // 重新排列DOM元素
+        products.forEach(product => {
+            productGrid.appendChild(product);
+        });
+    }
+    
+    // 清除筛选
+    function clearFilters() {
+        window.location.href = '{{ url_for("products") }}';
+    }
+    
+    // 批量添加到购物车
+    function addMultipleToCart() {
+        const selectedProducts = document.querySelectorAll('.product-checkbox:checked');
+        
+        if (selectedProducts.length === 0) {
+            showAlert('请选择要添加的商品', 'warning');
+            return;
+        }
+        
+        selectedProducts.forEach(checkbox => {
+            const productId = checkbox.dataset.productId;
+            addToCart(productId);
+        });
+    }
+    
+    // 商品对比功能
+    let compareList = [];
+    
+    function addToCompare(productId) {
+        if (compareList.includes(productId)) {
+            showAlert('该商品已在对比列表中', 'warning');
+            return;
+        }
+        
+        if (compareList.length >= 3) {
+            showAlert('最多只能对比3个商品', 'warning');
+            return;
+        }
+        
+        compareList.push(productId);
+        updateCompareButton();
+        showAlert('已添加到对比列表', 'success');
+    }
+    
+    function updateCompareButton() {
+        const compareBtn = document.getElementById('compareBtn');
+        if (compareBtn) {
+            compareBtn.textContent = `对比商品 (${compareList.length})`;
+            compareBtn.style.display = compareList.length > 0 ? 'block' : 'none';
+        }
+    }
+    
+    // 懒加载图片
+    function lazyLoadImages() {
+        const images = document.querySelectorAll('img[data-src]');
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+        
+        images.forEach(img => imageObserver.observe(img));
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        lazyLoadImages();
+        updateCompareButton();
+    });
+</script>
+{% endblock %}

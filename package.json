@@ -1,0 +1,54 @@
+{
+  "name": "testing-engineer-project",
+  "version": "1.0.0",
+  "description": "A comprehensive testing project for learning software testing",
+  "main": "index.js",
+  "scripts": {
+    "start": "python app/app.py",
+    "test": "pytest tests/automation/",
+    "test:ui": "pytest tests/automation/ui/",
+    "test:api": "pytest tests/automation/api/",
+    "test:performance": "locust -f tests/performance/locustfile.py",
+    "test:report": "pytest --html=reports/report.html --self-contained-html",
+    "test:allure": "pytest --alluredir=reports/allure-results",
+    "allure:serve": "allure serve reports/allure-results",
+    "lint": "flake8 tests/ app/",
+    "format": "black tests/ app/",
+    "install:python": "pip install -r requirements.txt",
+    "setup": "npm run install:python && npm install"
+  },
+  "keywords": [
+    "testing",
+    "automation",
+    "selenium",
+    "pytest",
+    "performance",
+    "api-testing",
+    "ui-testing"
+  ],
+  "author": "Testing Engineer",
+  "license": "MIT",
+  "devDependencies": {
+    "allure-commandline": "^2.24.1",
+    "newman": "^6.0.0",
+    "lighthouse": "^11.3.0",
+    "puppeteer": "^21.5.2"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/testing-engineer-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/testing-engineer-project/issues"
+  },
+  "homepage": "https://github.com/your-username/testing-engineer-project#readme"
+}

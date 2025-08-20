@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - 测试商城{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus"></i> 用户注册
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" id="registerForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> 用户名 <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               required 
+                               placeholder="请输入用户名（3-20个字符）"
+                               data-testid="username-input"
+                               minlength="3"
+                               maxlength="20">
+                        <div class="invalid-feedback"></div>
+                        <div class="form-text">用户名只能包含字母、数字和下划线</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> 邮箱 <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               required 
+                               placeholder="请输入邮箱地址"
+                               data-testid="email-input">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> 密码 <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   required 
+                                   placeholder="请输入密码（至少6个字符）"
+                                   data-testid="password-input"
+                                   minlength="6">
+                            <button class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    id="togglePassword"
+                                    data-testid="toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                        
+                        <!-- 密码强度指示器 -->
+                        <div class="mt-2">
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar" 
+                                     id="passwordStrength" 
+                                     role="progressbar" 
+                                     style="width: 0%"></div>
+                            </div>
+                            <small class="form-text" id="passwordStrengthText">密码强度：无</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">
+                            <i class="fas fa-lock"></i> 确认密码 <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="confirmPassword" 
+                               name="confirmPassword" 
+                               required 
+                               placeholder="请再次输入密码"
+                               data-testid="confirm-password-input">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="agreeTerms" 
+                               required
+                               data-testid="terms-checkbox">
+                        <label class="form-check-label" for="agreeTerms">
+                            我已阅读并同意 <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">用户协议</a> 和 <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">隐私政策</a>
+                        </label>
+                        <div class="invalid-feedback">请同意用户协议和隐私政策</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" 
+                                class="btn btn-success" 
+                                id="registerBtn"
+                                data-testid="register-button">
+                            <i class="fas fa-user-plus"></i> 注册账户
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="mb-2">已有账户？</p>
+                    <a href="{{ url_for('login') }}" 
+                       class="btn btn-outline-primary"
+                       data-testid="login-link">
+                        <i class="fas fa-sign-in-alt"></i> 立即登录
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 用户协议模态框 -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">用户协议</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. 服务条款</h6>
+                <p>本网站仅用于软件测试学习目的，不涉及真实的商业交易。</p>
+                
+                <h6>2. 用户责任</h6>
+                <p>用户应当合理使用本网站，不得进行恶意测试或攻击行为。</p>
+                
+                <h6>3. 数据安全</h6>
+                <p>请不要在测试过程中使用真实的个人敏感信息。</p>
+                
+                <h6>4. 免责声明</h6>
+                <p>本网站仅供学习使用，开发者不承担任何法律责任。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 隐私政策模态框 -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">隐私政策</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. 信息收集</h6>
+                <p>我们仅收集用于测试目的的基本信息，不会收集真实的个人敏感数据。</p>
+                
+                <h6>2. 信息使用</h6>
+                <p>收集的信息仅用于网站功能测试，不会用于其他商业目的。</p>
+                
+                <h6>3. 信息保护</h6>
+                <p>我们采取合理的安全措施保护用户信息，但建议不要使用真实密码。</p>
+                
+                <h6>4. 信息删除</h6>
+                <p>测试数据可能会定期清理，请不要依赖本网站存储重要信息。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 密码显示/隐藏切换
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+    
+    // 密码强度检测
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('passwordStrengthText');
+        
+        let strength = 0;
+        let strengthLabel = '无';
+        let strengthClass = '';
+        
+        if (password.length >= 6) strength += 1;
+        if (password.match(/[a-z]/)) strength += 1;
+        if (password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/[0-9]/)) strength += 1;
+        if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
+        
+        switch (strength) {
+            case 0:
+            case 1:
+                strengthLabel = '弱';
+                strengthClass = 'bg-danger';
+                break;
+            case 2:
+            case 3:
+                strengthLabel = '中等';
+                strengthClass = 'bg-warning';
+                break;
+            case 4:
+            case 5:
+                strengthLabel = '强';
+                strengthClass = 'bg-success';
+                break;
+        }
+        
+        const percentage = (strength / 5) * 100;
+        strengthBar.style.width = percentage + '%';
+        strengthBar.className = 'progress-bar ' + strengthClass;
+        strengthText.textContent = '密码强度：' + strengthLabel;
+    });
+    
+    // 表单验证
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const agreeTerms = document.getElementById('agreeTerms');
+        
+        let isValid = true;
+        
+        // 清除之前的验证状态
+        [username, email, password, confirmPassword, agreeTerms].forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+        
+        // 验证用户名
+        const usernamePattern = /^[a-zA-Z0-9_]+$/;
+        if (!usernamePattern.test(username.value)) {
+            username.classList.add('is-invalid');
+            username.nextElementSibling.textContent = '用户名只能包含字母、数字和下划线';
+            isValid = false;
+        }
+        
+        // 验证邮箱
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email.value)) {
+            email.classList.add('is-invalid');
+            email.nextElementSibling.textContent = '请输入有效的邮箱地址';
+            isValid = false;
+        }
+        
+        // 验证密码
+        if (password.value.length < 6) {
+            password.classList.add('is-invalid');
+            password.parentElement.nextElementSibling.textContent = '密码至少需要6个字符';
+            isValid = false;
+        }
+        
+        // 验证确认密码
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.classList.add('is-invalid');
+            confirmPassword.nextElementSibling.textContent = '两次输入的密码不一致';
+            isValid = false;
+        }
+        
+        // 验证协议同意
+        if (!agreeTerms.checked) {
+            agreeTerms.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        } else {
+            // 显示加载状态
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 注册中...';
+            registerBtn.disabled = true;
+        }
+    });
+    
+    // 实时验证
+    document.getElementById('username').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+        const usernamePattern = /^[a-zA-Z0-9_]+$/;
+        if (this.value && !usernamePattern.test(this.value)) {
+            this.classList.add('is-invalid');
+            this.nextElementSibling.textContent = '用户名只能包含字母、数字和下划线';
+        }
+    });
+    
+    document.getElementById('email').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+    
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+        const password = document.getElementById('password').value;
+        if (this.value && this.value !== password) {
+            this.classList.add('is-invalid');
+            this.nextElementSibling.textContent = '两次输入的密码不一致';
+        }
+    });
+    
+    document.getElementById('agreeTerms').addEventListener('change', function() {
+        this.classList.remove('is-invalid');
+    });
+</script>
+{% endblock %}

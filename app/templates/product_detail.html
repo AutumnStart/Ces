@@ -1,0 +1,722 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - 测试商城{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 商品图片 -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="product-image-container" style="height: 400px;">
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" 
+                             alt="{{ product.name }}" 
+                             class="img-fluid w-100 h-100" 
+                             style="object-fit: cover;"
+                             data-testid="product-main-image">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                            <i class="fas fa-image text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- 缩略图 -->
+                <div class="p-3">
+                    <div class="row g-2">
+                        {% for i in range(4) %}
+                        <div class="col-3">
+                            <div class="thumbnail-container" 
+                                 style="height: 80px; cursor: pointer;"
+                                 onclick="changeMainImage(this)"
+                                 data-testid="thumbnail-{{ i }}">
+                                {% if product.image_url %}
+                                    <img src="{{ product.image_url }}" 
+                                         alt="缩略图 {{ i+1 }}" 
+                                         class="img-fluid w-100 h-100 border rounded" 
+                                         style="object-fit: cover;">
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center h-100 bg-light border rounded">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 商品信息 -->
+    <div class="col-md-6">
+        <div class="product-info">
+            <!-- 面包屑导航 -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('index') }}" data-testid="breadcrumb-home">首页</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('products') }}" data-testid="breadcrumb-products">商品列表</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('products', category=product.category) }}" 
+                           data-testid="breadcrumb-category">{{ product.category }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page" data-testid="breadcrumb-current">
+                        {{ product.name }}
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- 商品标题 -->
+            <h1 class="h3 mb-3" data-testid="product-title">{{ product.name }}</h1>
+            
+            <!-- 商品评分和评论 -->
+            <div class="d-flex align-items-center mb-3">
+                <div class="rating me-3" data-testid="product-rating">
+                    {% for i in range(5) %}
+                        {% if i < 4 %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-muted"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="ms-2 text-muted">(4.0)</span>
+                </div>
+                <div class="text-muted">
+                    <a href="#reviews" class="text-decoration-none" data-testid="reviews-link">
+                        128条评论
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 价格 -->
+            <div class="price-section mb-4">
+                <div class="d-flex align-items-baseline">
+                    <span class="h2 text-primary fw-bold me-3" data-testid="product-price">
+                        ¥{{ "%.2f"|format(product.price) }}
+                    </span>
+                    <span class="text-muted text-decoration-line-through" data-testid="original-price">
+                        ¥{{ "%.2f"|format(product.price * 1.2) }}
+                    </span>
+                    <span class="badge bg-danger ms-2">8折</span>
+                </div>
+                <small class="text-muted">包邮 | 7天无理由退货</small>
+            </div>
+            
+            <!-- 商品属性 -->
+            <div class="product-attributes mb-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <strong>分类：</strong>
+                        <span data-testid="product-category">{{ product.category }}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>库存：</strong>
+                        <span class="{% if product.stock > 10 %}text-success{% elif product.stock > 0 %}text-warning{% else %}text-danger{% endif %}"
+                              data-testid="product-stock">
+                            {% if product.stock > 0 %}
+                                {{ product.stock }} 件
+                            {% else %}
+                                缺货
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="col-6">
+                        <strong>商品编号：</strong>
+                        <span data-testid="product-id">SP{{ "%06d"|format(product.id) }}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>品牌：</strong>
+                        <span data-testid="product-brand">测试品牌</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 规格选择 -->
+            <div class="specifications mb-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">颜色</label>
+                    <div class="btn-group" role="group" aria-label="颜色选择">
+                        <input type="radio" class="btn-check" name="color" id="color1" value="红色" checked>
+                        <label class="btn btn-outline-secondary" for="color1" data-testid="color-red">红色</label>
+                        
+                        <input type="radio" class="btn-check" name="color" id="color2" value="蓝色">
+                        <label class="btn btn-outline-secondary" for="color2" data-testid="color-blue">蓝色</label>
+                        
+                        <input type="radio" class="btn-check" name="color" id="color3" value="黑色">
+                        <label class="btn btn-outline-secondary" for="color3" data-testid="color-black">黑色</label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">尺寸</label>
+                    <div class="btn-group" role="group" aria-label="尺寸选择">
+                        <input type="radio" class="btn-check" name="size" id="size1" value="S">
+                        <label class="btn btn-outline-secondary" for="size1" data-testid="size-s">S</label>
+                        
+                        <input type="radio" class="btn-check" name="size" id="size2" value="M" checked>
+                        <label class="btn btn-outline-secondary" for="size2" data-testid="size-m">M</label>
+                        
+                        <input type="radio" class="btn-check" name="size" id="size3" value="L">
+                        <label class="btn btn-outline-secondary" for="size3" data-testid="size-l">L</label>
+                        
+                        <input type="radio" class="btn-check" name="size" id="size4" value="XL">
+                        <label class="btn btn-outline-secondary" for="size4" data-testid="size-xl">XL</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数量选择 -->
+            <div class="quantity-section mb-4">
+                <label class="form-label fw-bold">数量</label>
+                <div class="d-flex align-items-center">
+                    <div class="input-group" style="width: 150px;">
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                onclick="changeQuantity(-1)"
+                                data-testid="quantity-decrease">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" 
+                               class="form-control text-center" 
+                               id="quantity" 
+                               value="1" 
+                               min="1" 
+                               max="{{ product.stock }}"
+                               data-testid="quantity-input">
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                onclick="changeQuantity(1)"
+                                data-testid="quantity-increase">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted ms-3">最多可购买 {{ product.stock }} 件</small>
+                </div>
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="action-buttons mb-4">
+                {% if session.user_id %}
+                    {% if product.stock > 0 %}
+                        <div class="d-grid gap-2 d-md-flex">
+                            <button class="btn btn-cart btn-lg flex-fill" 
+                                    onclick="addToCartWithQuantity()"
+                                    data-testid="add-to-cart-button">
+                                <i class="fas fa-cart-plus me-2"></i>加入购物车
+                            </button>
+                            <button class="btn btn-warning btn-lg flex-fill" 
+                                    onclick="buyNow()"
+                                    data-testid="buy-now-button">
+                                <i class="fas fa-bolt me-2"></i>立即购买
+                            </button>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-3">
+                            <button class="btn btn-outline-secondary flex-fill" 
+                                    onclick="addToWishlist({{ product.id }})"
+                                    data-testid="add-to-wishlist">
+                                <i class="far fa-heart me-2"></i>收藏
+                            </button>
+                            <button class="btn btn-outline-secondary flex-fill" 
+                                    onclick="shareProduct()"
+                                    data-testid="share-product">
+                                <i class="fas fa-share me-2"></i>分享
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            该商品暂时缺货，请关注补货通知
+                        </div>
+                        <button class="btn btn-outline-primary btn-lg w-100" 
+                                onclick="notifyWhenAvailable()"
+                                data-testid="notify-button">
+                            <i class="fas fa-bell me-2"></i>到货通知
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        请先 <a href="{{ url_for('login') }}" class="alert-link">登录</a> 后再购买商品
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- 服务保障 -->
+            <div class="service-guarantee">
+                <h6 class="fw-bold mb-3">服务保障</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-truck text-primary me-2"></i>
+                            <small>免费配送</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-undo text-primary me-2"></i>
+                            <small>7天退货</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-primary me-2"></i>
+                            <small>正品保证</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-headset text-primary me-2"></i>
+                            <small>24小时客服</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 商品详情标签页 -->
+<div class="row mt-5">
+    <div class="col-12">
+        <ul class="nav nav-tabs" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" 
+                        id="description-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#description" 
+                        type="button" 
+                        role="tab" 
+                        aria-controls="description" 
+                        aria-selected="true"
+                        data-testid="description-tab">
+                    <i class="fas fa-info-circle me-2"></i>商品详情
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" 
+                        id="specifications-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#specifications" 
+                        type="button" 
+                        role="tab" 
+                        aria-controls="specifications" 
+                        aria-selected="false"
+                        data-testid="specifications-tab">
+                    <i class="fas fa-list me-2"></i>规格参数
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" 
+                        id="reviews-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#reviews" 
+                        type="button" 
+                        role="tab" 
+                        aria-controls="reviews" 
+                        aria-selected="false"
+                        data-testid="reviews-tab">
+                    <i class="fas fa-star me-2"></i>用户评价 (128)
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="productTabsContent">
+            <!-- 商品详情 -->
+            <div class="tab-pane fade show active" 
+                 id="description" 
+                 role="tabpanel" 
+                 aria-labelledby="description-tab">
+                <div class="p-4">
+                    <div class="product-description" data-testid="product-description">
+                        <p>{{ product.description }}</p>
+                        
+                        <h5 class="mt-4 mb-3">产品特点</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>高品质材料制作</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>精工细作，品质保证</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>时尚设计，经典款式</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>舒适体验，贴心设计</li>
+                        </ul>
+                        
+                        <h5 class="mt-4 mb-3">使用说明</h5>
+                        <p class="text-muted">
+                            请按照产品说明书正确使用本产品。如有任何问题，请联系客服。
+                            本产品享有一年质保服务，非人为损坏可免费维修或更换。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 规格参数 -->
+            <div class="tab-pane fade" 
+                 id="specifications" 
+                 role="tabpanel" 
+                 aria-labelledby="specifications-tab">
+                <div class="p-4">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" data-testid="specifications-table">
+                            <tbody>
+                                <tr>
+                                    <td class="bg-light fw-bold" style="width: 30%;">商品名称</td>
+                                    <td>{{ product.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">商品分类</td>
+                                    <td>{{ product.category }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">商品编号</td>
+                                    <td>SP{{ "%06d"|format(product.id) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">品牌</td>
+                                    <td>测试品牌</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">材质</td>
+                                    <td>优质材料</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">产地</td>
+                                    <td>中国</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">保修期</td>
+                                    <td>1年</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 用户评价 -->
+            <div class="tab-pane fade" 
+                 id="reviews" 
+                 role="tabpanel" 
+                 aria-labelledby="reviews-tab">
+                <div class="p-4">
+                    <!-- 评价统计 -->
+                    <div class="review-summary mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="h2 text-warning mb-2">4.0</div>
+                                    <div class="rating mb-2">
+                                        {% for i in range(5) %}
+                                            {% if i < 4 %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="text-muted">基于128条评价</div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="rating-breakdown">
+                                    {% for i in range(5, 0, -1) %}
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="me-2">{{ i }}星</span>
+                                        <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-warning" 
+                                                 style="width: {{ (6-i) * 20 }}%"></div>
+                                        </div>
+                                        <span class="text-muted">{{ (6-i) * 20 }}%</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 评价列表 -->
+                    <div class="reviews-list" data-testid="reviews-list">
+                        {% for i in range(5) %}
+                        <div class="review-item border-bottom pb-3 mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="avatar me-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-1">用户{{ i+1 }}</h6>
+                                            <div class="rating">
+                                                {% for j in range(5) %}
+                                                    {% if j < (5-i%2) %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-muted"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">2024-01-{{ 15+i }}</small>
+                                    </div>
+                                    <p class="mb-2">
+                                        {% if i == 0 %}
+                                            商品质量很好，物流也很快，包装完整，非常满意！
+                                        {% elif i == 1 %}
+                                            性价比不错，功能齐全，使用体验良好。
+                                        {% elif i == 2 %}
+                                            外观设计很漂亮，做工精细，值得推荐。
+                                        {% elif i == 3 %}
+                                            客服态度很好，售后服务及时，整体满意。
+                                        {% else %}
+                                            商品符合描述，发货速度快，下次还会购买。
+                                        {% endif %}
+                                    </p>
+                                    <div class="review-actions">
+                                        <button class="btn btn-sm btn-outline-secondary me-2" 
+                                                onclick="likeReview({{ i }})"
+                                                data-testid="like-review-{{ i }}">
+                                            <i class="far fa-thumbs-up"></i> 有用 ({{ i*3+5 }})
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                onclick="replyReview({{ i }})"
+                                                data-testid="reply-review-{{ i }}">
+                                            <i class="far fa-comment"></i> 回复
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <nav aria-label="评价分页" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <span class="page-link">上一页</span>
+                            </li>
+                            <li class="page-item active">
+                                <span class="page-link">1</span>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 相关商品推荐 -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h4 class="mb-4">
+            <i class="fas fa-heart text-danger me-2"></i>相关商品推荐
+        </h4>
+        <div class="row">
+            {% for i in range(4) %}
+            <div class="col-md-3 mb-4">
+                <div class="card product-card h-100 shadow-sm">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                         style="height: 200px;">
+                        <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">相关商品 {{ i+1 }}</h6>
+                        <p class="card-text text-muted small">这是一个相关商品的描述...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-primary fw-bold">¥{{ "%.2f"|format((i+1)*99.99) }}</span>
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    data-testid="related-product-{{ i }}">
+                                查看
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 切换主图
+    function changeMainImage(thumbnail) {
+        const mainImage = document.querySelector('[data-testid="product-main-image"]');
+        const thumbnailImage = thumbnail.querySelector('img');
+        
+        if (mainImage && thumbnailImage) {
+            mainImage.src = thumbnailImage.src;
+        }
+        
+        // 更新缩略图选中状态
+        document.querySelectorAll('.thumbnail-container').forEach(thumb => {
+            thumb.classList.remove('border-primary');
+        });
+        thumbnail.classList.add('border-primary');
+    }
+    
+    // 数量调整
+    function changeQuantity(delta) {
+        const quantityInput = document.getElementById('quantity');
+        const currentValue = parseInt(quantityInput.value);
+        const maxValue = parseInt(quantityInput.max);
+        const minValue = parseInt(quantityInput.min);
+        
+        const newValue = currentValue + delta;
+        
+        if (newValue >= minValue && newValue <= maxValue) {
+            quantityInput.value = newValue;
+        }
+    }
+    
+    // 带数量添加到购物车
+    function addToCartWithQuantity() {
+        const quantity = document.getElementById('quantity').value;
+        const color = document.querySelector('input[name="color"]:checked')?.value;
+        const size = document.querySelector('input[name="size"]:checked')?.value;
+        
+        if (!color || !size) {
+            showAlert('请选择商品规格', 'warning');
+            return;
+        }
+        
+        // 调用基础的添加到购物车功能
+        addToCart({{ product.id }}, quantity, {
+            color: color,
+            size: size
+        });
+    }
+    
+    // 立即购买
+    function buyNow() {
+        const quantity = document.getElementById('quantity').value;
+        const color = document.querySelector('input[name="color"]:checked')?.value;
+        const size = document.querySelector('input[name="size"]:checked')?.value;
+        
+        if (!color || !size) {
+            showAlert('请选择商品规格', 'warning');
+            return;
+        }
+        
+        // 添加到购物车后跳转到结算页面
+        addToCart({{ product.id }}, quantity, {
+            color: color,
+            size: size
+        }, function() {
+            window.location.href = '/checkout';
+        });
+    }
+    
+    // 添加到收藏
+    function addToWishlist(productId) {
+        fetch('/api/wishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('已添加到收藏夹', 'success');
+                // 更新按钮状态
+                const wishlistBtn = document.querySelector('[data-testid="add-to-wishlist"]');
+                wishlistBtn.innerHTML = '<i class="fas fa-heart me-2"></i>已收藏';
+                wishlistBtn.classList.remove('btn-outline-secondary');
+                wishlistBtn.classList.add('btn-danger');
+            } else {
+                showAlert(data.message || '收藏失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('收藏失败', 'error');
+        });
+    }
+    
+    // 分享商品
+    function shareProduct() {
+        if (navigator.share) {
+            navigator.share({
+                title: '{{ product.name }}',
+                text: '{{ product.description[:100] }}',
+                url: window.location.href
+            });
+        } else {
+            // 复制链接到剪贴板
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showAlert('商品链接已复制到剪贴板', 'success');
+            });
+        }
+    }
+    
+    // 到货通知
+    function notifyWhenAvailable() {
+        showAlert('到货通知设置成功，商品到货后会及时通知您', 'success');
+    }
+    
+    // 评价点赞
+    function likeReview(reviewIndex) {
+        const likeBtn = document.querySelector(`[data-testid="like-review-${reviewIndex}"]`);
+        const currentText = likeBtn.textContent;
+        const currentCount = parseInt(currentText.match(/\d+/)[0]);
+        
+        likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> 有用 (${currentCount + 1})`;
+        likeBtn.classList.remove('btn-outline-secondary');
+        likeBtn.classList.add('btn-secondary');
+        likeBtn.disabled = true;
+        
+        showAlert('感谢您的反馈', 'success');
+    }
+    
+    // 回复评价
+    function replyReview(reviewIndex) {
+        showAlert('回复功能开发中...', 'info');
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置第一个缩略图为选中状态
+        const firstThumbnail = document.querySelector('[data-testid="thumbnail-0"]');
+        if (firstThumbnail) {
+            firstThumbnail.classList.add('border-primary');
+        }
+        
+        // 监听数量输入框变化
+        const quantityInput = document.getElementById('quantity');
+        quantityInput.addEventListener('change', function() {
+            const value = parseInt(this.value);
+            const max = parseInt(this.max);
+            const min = parseInt(this.min);
+            
+            if (value > max) {
+                this.value = max;
+                showAlert(`最多只能购买 ${max} 件`, 'warning');
+            } else if (value < min) {
+                this.value = min;
+            }
+        });
+    });
+</script>
+{% endblock %}
