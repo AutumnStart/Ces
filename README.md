@@ -447,27 +447,6 @@ python init_db.py
 - **可视化测试**: 添加视觉回归测试
 - **监控集成**: 集成APM工具进行性能监控
 
-## 贡献指南
-
-### 🤝 如何贡献
-1. Fork项目到你的GitHub账户
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交你的修改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建Pull Request
-
-### 📝 贡献规范
-- 遵循PEP 8代码规范
-- 添加适当的测试用例
-- 更新相关文档
-- 确保所有测试通过
-
-## 联系方式
-
-- **项目维护者**: [您的姓名]
-- **邮箱**: [您的邮箱]
-- **GitHub**: [项目地址]
-
 ## 许可证
 
 MIT License - 详见 [LICENSE](LICENSE) 文件
